@@ -7,6 +7,7 @@ import { McpUtilities } from "../mcp-utilities";
 import { NullUtilities } from "../null-utilities";
 import { FhirClientInstance } from "../fhir-client";
 import { fhirR4 } from "@smile-cdr/fhirts";
+import { invokeBedrockClaude } from "../bedrock-client";
 
 class GenerateVisitSummaryTool implements IMcpTool {
   registerTool(server: McpServer, req: Request) {
@@ -202,7 +203,26 @@ class GenerateVisitSummaryTool implements IMcpTool {
         }
         summary += `\n`;
 
-        summary += `---\n`;
+        // AI Clinical Briefing via Bedrock Claude
+        try {
+          const aiBriefing = await invokeBedrockClaude(
+            "You are an experienced attending physician preparing for a patient visit. " +
+              "Based on the following patient data, generate a concise clinical briefing that includes: " +
+              "1) **Key Concerns**: Top 3 items the clinician should address in this visit, " +
+              "2) **Medication Review**: Any concerns about the current medication regimen, " +
+              "3) **Gaps in Care**: Missing screenings, overdue labs, or follow-up items, " +
+              "4) **Suggested Questions**: 2-3 questions to ask the patient based on their history. " +
+              "Be concise, actionable, and prioritized. " +
+              "IMPORTANT: This is AI-generated clinical decision support — verify all data against the source EHR.",
+            summary,
+            1500,
+          );
+          summary += `\n---\n\n### 🤖 AI Pre-Visit Briefing (Powered by Amazon Bedrock)\n${aiBriefing}`;
+        } catch (error) {
+          summary += `\n---\n\n*AI pre-visit briefing unavailable — displaying raw data only.*`;
+        }
+
+        summary += `\n\n---\n`;
         summary += `*Generated for clinical review. Verify all data against the source EHR before making clinical decisions.*\n`;
 
         return McpUtilities.createTextResponse(summary);

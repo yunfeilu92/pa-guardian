@@ -7,6 +7,7 @@ import { McpUtilities } from "../mcp-utilities";
 import { NullUtilities } from "../null-utilities";
 import { FhirClientInstance } from "../fhir-client";
 import { fhirR4 } from "@smile-cdr/fhirts";
+import { invokeBedrockClaude } from "../bedrock-client";
 
 const KNOWN_INTERACTIONS: Record<
   string,
@@ -203,6 +204,35 @@ class CheckDrugInteractionsTool implements IMcpTool {
 
           summary +=
             "*Recommendation: Review flagged interactions with a clinical pharmacist before making prescribing decisions.*\n";
+        }
+
+        // AI Pharmacological Analysis via Bedrock Claude
+        try {
+          const patientData = await FhirClientInstance.read<fhirR4.Patient>(
+            req,
+            `Patient/${patientId}`,
+          );
+          const age = patientData?.birthDate
+            ? Math.floor(
+                (Date.now() - new Date(patientData.birthDate).getTime()) /
+                  (365.25 * 24 * 60 * 60 * 1000),
+              )
+            : "unknown";
+          const gender = patientData?.gender || "unknown";
+
+          const aiAnalysis = await invokeBedrockClaude(
+            "You are a clinical pharmacist specializing in drug safety. Analyze the following medication list " +
+              "and any detected interactions in the context of this specific patient. Consider: " +
+              "1) Patient-specific risk factors (age, gender) that may affect drug metabolism, " +
+              "2) Additional interactions not in the rule-based check that an AI can identify, " +
+              "3) Dosing considerations and monitoring recommendations. " +
+              "Be concise but clinically actionable. " +
+              "IMPORTANT: This is for clinical decision support — always recommend pharmacist verification.",
+            `Patient: Age ${age}, Gender ${gender}\nActive medications: ${medications.join(", ")}\nRule-based interactions found: ${interactions.length > 0 ? interactions.map((i) => `${i.drug1} ↔ ${i.drug2}: ${i.description}`).join("; ") : "None"}`,
+          );
+          summary += `\n### 🤖 AI Pharmacological Analysis (Powered by Amazon Bedrock)\n${aiAnalysis}`;
+        } catch (error) {
+          summary += `\n*AI pharmacological analysis unavailable.*`;
         }
 
         return McpUtilities.createTextResponse(summary);

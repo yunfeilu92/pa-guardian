@@ -7,6 +7,7 @@ import { McpUtilities } from "../mcp-utilities";
 import { NullUtilities } from "../null-utilities";
 import { FhirClientInstance } from "../fhir-client";
 import { fhirR4 } from "@smile-cdr/fhirts";
+import { invokeBedrockClaude } from "../bedrock-client";
 
 class AnalyzeLabResultsTool implements IMcpTool {
   registerTool(server: McpServer, req: Request) {
@@ -149,6 +150,22 @@ class AnalyzeLabResultsTool implements IMcpTool {
 
         summary += `### All Results\n`;
         summary += results.join("\n");
+
+        // AI Clinical Analysis via Bedrock Claude
+        try {
+          const aiAnalysis = await invokeBedrockClaude(
+            "You are a clinical laboratory specialist. Analyze the following lab results and provide: " +
+              "1) Key clinical patterns or correlations between values, " +
+              "2) Possible clinical significance of any abnormal values, " +
+              "3) Recommended follow-up tests if applicable. " +
+              "Be concise but clinically precise. Use medical terminology appropriate for a physician audience. " +
+              "IMPORTANT: This is for clinical decision support only — always recommend verification with the source EHR.",
+            `Patient lab results:\n${results.join("\n")}`,
+          );
+          summary += `\n\n### 🤖 AI Clinical Analysis (Powered by Amazon Bedrock)\n${aiAnalysis}`;
+        } catch (error) {
+          summary += `\n\n*AI analysis unavailable — displaying raw results only.*`;
+        }
 
         return McpUtilities.createTextResponse(summary);
       },
