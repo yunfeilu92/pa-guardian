@@ -1,13 +1,13 @@
 import { PatientAgeToolInstance } from "./PatientAgeTool";
 import { PatientIdToolInstance } from "./PatientIdTool";
-import { AnalyzeLabResultsToolInstance } from "./AnalyzeLabResultsTool";
-import { CheckDrugInteractionsToolInstance } from "./CheckDrugInteractionsTool";
-import { GenerateVisitSummaryToolInstance } from "./GenerateVisitSummaryTool";
+import { ExtractPAEvidenceToolInstance } from "./ExtractPAEvidenceTool";
+import { AssessPAReadinessToolInstance } from "./AssessPAReadinessTool";
+import { GeneratePADocumentsToolInstance } from "./GeneratePADocumentsTool";
 
 export {
   PatientAgeToolInstance,
   PatientIdToolInstance,
-  AnalyzeLabResultsToolInstance,
-  CheckDrugInteractionsToolInstance,
-  GenerateVisitSummaryToolInstance,
+  ExtractPAEvidenceToolInstance,
+  AssessPAReadinessToolInstance,
+  GeneratePADocumentsToolInstance,
 };
