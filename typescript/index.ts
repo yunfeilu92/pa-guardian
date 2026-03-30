@@ -14,6 +14,7 @@ switch (env) {
     break;
   case "prod":
     allowedHosts.push("ts.fhir-mcp.promptopinion.ai");
+    allowedHosts.push("pa-guardian.onrender.com");
     break;
   default:
     allowedHosts.push("localhost");
