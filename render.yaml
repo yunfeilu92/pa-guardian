@@ -17,4 +17,4 @@ services:
       - key: AWS_SECRET_ACCESS_KEY
         sync: false
       - key: BEDROCK_MODEL_ID
-        value: anthropic.claude-3-haiku-20240307-v1:0
+        value: anthropic.claude-sonnet-4-6
