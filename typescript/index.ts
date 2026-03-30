@@ -22,7 +22,7 @@ switch (env) {
 
 const app = createMcpExpressApp({
   host: "0.0.0.0",
-  allowedHosts,
+  ...(env === "prod" ? {} : { allowedHosts }),
 });
 
 const port = process.env["PORT"] || 5000;
