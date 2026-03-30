@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: pa-guardian
+    runtime: docker
+    dockerfilePath: ./typescript/Dockerfile
+    dockerContext: ./typescript
+    plan: free
+    envVars:
+      - key: PORT
+        value: "5000"
+      - key: PO_ENV
+        value: prod
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: BEDROCK_MODEL_ID
+        value: anthropic.claude-3-haiku-20240307-v1:0
