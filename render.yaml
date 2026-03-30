@@ -17,4 +17,4 @@ services:
       - key: AWS_SECRET_ACCESS_KEY
         sync: false
       - key: BEDROCK_MODEL_ID
-        value: anthropic.claude-sonnet-4-6
+        value: us.anthropic.claude-sonnet-4-6

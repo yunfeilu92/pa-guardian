@@ -6,7 +6,7 @@ import {
 const region = process.env["AWS_REGION"] || "us-east-1";
 const modelId =
   process.env["BEDROCK_MODEL_ID"] ||
-  "anthropic.claude-sonnet-4-6";
+  "us.anthropic.claude-sonnet-4-6";
 
 const client = new BedrockRuntimeClient({ region });
 
